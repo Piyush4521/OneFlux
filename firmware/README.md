@@ -1,30 +1,63 @@
 # OneFlux ESP32 Firmware
 
-## 1. Wire the hardware
+Firmware for ESP32 + PZEM004T v3 energy metering with safety relay control.
+
+## Hardware Wiring
+
 - `PZEM004T v3 TX/RX` -> ESP32 `RX2/TX2` on pins `16/17`
-- Relay input -> ESP32 `GPIO25`
-- Manual override button -> ESP32 `GPIO26` to GND (internal pull-up enabled)
-- Status LED uses `GPIO2`
+- Relay module input -> ESP32 `GPIO25`
+- Manual override button -> ESP32 `GPIO26` to GND (`INPUT_PULLUP`)
+- Status LED -> ESP32 `GPIO2`
 
-## 2. Configure credentials
-- Open `firmware/oneflux_esp32.ino`
-- Set `WIFI_SSID` and `WIFI_PASSWORD`
-- Set `DATABASE_URL`
-- Set `DATABASE_SECRET` to a valid RTDB auth token
+## Prerequisites
 
-## 3. Flash
-- Board: ESP32
-- Serial monitor baud: `115200`
-- Upload `firmware/oneflux_esp32.ino`
+- Arduino IDE with ESP32 board package installed
+- Libraries:
+  - `PZEM004Tv30`
+  - `WiFi` (built-in)
+  - `HTTPClient` (built-in)
 
-## 4. Firebase paths used
+## Configure Firmware
+
+Edit `firmware/oneflux_esp32/oneflux_esp32.ino`:
+
+- `WIFI_SSID`
+- `WIFI_PASSWORD`
+- `DATABASE_URL`
+- `DATABASE_SECRET` (RTDB auth token)
+
+## Flash Instructions
+
+1. Select board: `ESP32 Dev Module` (or your ESP32 variant)
+2. Set serial monitor baud to `115200`
+3. Upload `firmware/oneflux_esp32/oneflux_esp32.ino`
+4. Open serial monitor and confirm Wi-Fi + snapshot messages
+
+## Firebase Paths
+
 - Telemetry write: `/devices/socket1/live`
 - Command read: `/devices/socket1/control/relayDesired`
-- Alert events: `/devices/socket1/alerts/*`
+- Alerts write: `/devices/socket1/alerts/*`
 
-## 5. Device behavior
-- Reads sensor every `250 ms`
-- Runs local safety checks (voltage/current/power) continuously
-- Polls relay command every `800 ms`
-- Publishes one telemetry payload every `1000 ms`
-- Trips relay locally on sustained fault (`FAULT_HOLD_MS`)
+## Runtime Behavior
+
+- Sensor sample every `250 ms` (`SENSOR_INTERVAL_MS`)
+- Command poll every `800 ms` (`COMMAND_POLL_INTERVAL_MS`)
+- Telemetry publish every `1000 ms` (`PUBLISH_INTERVAL_MS`)
+- Wi-Fi reconnect retries every `8000 ms`
+- Local trip on sustained fault after `FAULT_HOLD_MS` (`600 ms`)
+
+## Safety Thresholds (Default)
+
+- Voltage min: `200 V`
+- Voltage max: `250 V`
+- Current max: `10 A`
+- Power max: `2200 W`
+
+Update these constants for your electrical environment and load profile.
+
+## Troubleshooting
+
+- `sensor_disconnected`: check PZEM wiring and UART pins `16/17`
+- Snapshot send failed: verify Wi-Fi and Firebase token validity
+- Relay not switching: confirm relay wiring, `GPIO25`, and module logic level

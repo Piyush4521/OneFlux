@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { initializeApp } from "firebase/app";
-import { getDatabase, onValue, ref, set } from "firebase/database";
+import { onValue, ref, set } from "firebase/database";
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import {
   Activity,
@@ -16,19 +15,7 @@ import {
   Zap,
 } from "lucide-react";
 import "./App.css";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyCoQUC1GnV9VKbTZ4bhC8PtisFCZGKgnPQ",
-  authDomain: "oneflux-41cbc.firebaseapp.com",
-  databaseURL: "https://oneflux-41cbc-default-rtdb.firebaseio.com",
-  projectId: "oneflux-41cbc",
-  storageBucket: "oneflux-41cbc.firebasestorage.app",
-  messagingSenderId: "803427248746",
-  appId: "1:803427248746:web:2bf0ed5b8336104a093813",
-};
-
-const app = initializeApp(firebaseConfig);
-const database = getDatabase(app);
+import { database } from "./config/firebase";
 
 const COST_PER_KWH = 6.5;
 const CO2_PER_KWH = 0.82;
@@ -479,7 +466,7 @@ export default function App() {
             onClick={() => setActiveTab("theory")}
             type="button"
           >
-            Theory & Guide
+            Theory & About
           </button>
         </section>
 
@@ -797,6 +784,34 @@ export default function App() {
                 <li>Explain latency from ESP sample time versus dashboard render time.</li>
                 <li>Map each alert to threshold and code for auditability.</li>
               </ol>
+            </article>
+
+            <article className="panel">
+              <div className="panel-header">
+                <h3>About OneFlux</h3>
+                <span>Project context</span>
+              </div>
+              <ul className="about-list">
+                <li>
+                  <strong>Goal:</strong> create a practical IoT energy monitor with local fault protection and remote
+                  visibility.
+                </li>
+                <li>
+                  <strong>Edge layer:</strong> ESP32 + PZEM004T samples voltage/current/power and triggers relay trips
+                  locally.
+                </li>
+                <li>
+                  <strong>Cloud layer:</strong> Firebase Realtime Database carries telemetry, alerts, and control
+                  intents.
+                </li>
+                <li>
+                  <strong>Dashboard layer:</strong> this app visualizes live metrics, trend history, safety alerts, and
+                  relay command acknowledgement.
+                </li>
+                <li>
+                  <strong>Why local safety matters:</strong> trips still work even when internet or dashboard is down.
+                </li>
+              </ul>
             </article>
           </section>
         )}
